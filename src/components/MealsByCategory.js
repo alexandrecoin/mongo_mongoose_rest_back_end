@@ -5,6 +5,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
 
 class MealsByCategory extends React.Component {
   constructor(props) {
@@ -25,7 +26,6 @@ class MealsByCategory extends React.Component {
     this.setState({
       detailedMealUrl: `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${data.idMeal}`,
     });
-    console.log(this.state.detailedMealUrl);
   };
 
   componentDidUpdate = (prevProps) => {
@@ -42,35 +42,39 @@ class MealsByCategory extends React.Component {
     const { mealsByCategory, detailedMealUrl } = this.state;
     return (
       <Fragment>
-        {mealsByCategory.map((mealByCategory, index) => (
-          <Card
-            key={mealByCategory.idMeal}
-            style={{ maxWidth: '200px', textAlign: 'center' }}
-          >
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                {mealByCategory.strMeal}
-              </Typography>
-              <img
-                alt="meal"
-                src={mealByCategory.strMealThumb}
-                style={{ maxWidth: '100px' }}
-              ></img>
-            </CardContent>
-            <CardActions>
-              <Button
-                size="small"
-                onClick={(e) => this.handleClick(e, mealByCategory)}
-                style={{ paddingLeft: '50px' }}
+        <Grid container spacing={3}>
+          {mealsByCategory.map((mealByCategory, index) => (
+            <Grid item xs={3}>
+              <Card
+                key={mealByCategory.idMeal}
+                style={{ maxWidth: '200px', textAlign: 'center' }}
               >
-                Learn More
-              </Button>
-            </CardActions>
-          </Card>
-        ))}
-        {detailedMealUrl.length > 0 ? (
-          <DetailedMeal detailedMealUrl={detailedMealUrl} />
-        ) : null}
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    {mealByCategory.strMeal}
+                  </Typography>
+                  <img
+                    alt="meal"
+                    src={mealByCategory.strMealThumb}
+                    style={{ maxWidth: '100px' }}
+                  ></img>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    size="small"
+                    onClick={(e) => this.handleClick(e, mealByCategory)}
+                    style={{ paddingLeft: '50px' }}
+                  >
+                    Learn More
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+          {detailedMealUrl.length > 0 ? (
+            <DetailedMeal detailedMealUrl={detailedMealUrl} />
+          ) : null}
+        </Grid>
       </Fragment>
     );
   }
