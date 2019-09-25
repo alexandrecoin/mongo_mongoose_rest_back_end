@@ -26,10 +26,14 @@ class DetailedMeal extends React.Component {
 
   render() {
     const { detailedMeal } = this.state;
-    console.log(detailedMeal[0])
     return (
       <Fragment>
-        {detailedMeal.length > 0 ? <div>{detailedMeal[0].strArea}</div> : null}
+        {detailedMeal.length > 0 ? (
+          <div>
+            <p>{detailedMeal[0].strArea}</p>
+            <p>{detailedMeal[0].strInstructions}</p>
+          </div>
+        ) : null}
       </Fragment>
     );
   }
