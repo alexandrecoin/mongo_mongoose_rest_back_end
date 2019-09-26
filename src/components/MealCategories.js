@@ -1,37 +1,32 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import MealsByCategory from './MealsByCategory';
 
-class MealCategories extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      categories: [],
-      url: '',
-    };
+const MealCategories = () => {
+
+  const [categories, setCategories] = useState([]);
+  const [url, setUrl] = useState('');
+
+  async function fetchApiData() {
+    const response = await fetch('https://www.themealdb.com/api/json/v1/1/categories.php')
+    const data = await response.json()
+    setCategories(data.categories)
   }
+  useEffect(() => {
+    fetchApiData()
+  }, [])
 
-  handleClick = (e, data) => {
+  async function handleClick(e, data) {
     e.preventDefault();
-    this.setState({
-      url: `https://www.themealdb.com/api/json/v1/1/filter.php?c=${data.strCategory}`,
-    });
+    setUrl(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${data.strCategory}`);
   };
 
-  componentDidMount = async () => {
-    fetch('https://www.themealdb.com/api/json/v1/1/categories.php')
-      .then((response) => response.json())
-      .then((data) => this.setState({ categories: data.categories }));
-  };
-
-  render() {
-    const { categories, url } = this.state;
     return (
       <Fragment>
         <ul>
           {categories.map((category) => (
             <button
               key={category.idCategory}
-              onClick={(e) => this.handleClick(e, category)}
+              onClick={(e) => handleClick(e, category)}
             >
               {category.strCategory}
             </button>
@@ -41,6 +36,5 @@ class MealCategories extends React.Component {
       </Fragment>
     );
   }
-}
 
 export default MealCategories;
