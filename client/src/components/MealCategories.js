@@ -36,12 +36,7 @@ const MealCategories = () => {
           </button>
         ))}
       </ul>
-      {url.length > 0 ? (
-        <Route
-          path="/mealsByCategory"
-          render={(props) => <MealsByCategory {...props} url={url} />}
-        />
-      ) : null}
+      {url.length > 0 ? <MealsByCategory url={url} /> : null}
     </Fragment>
   );
 };

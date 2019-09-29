@@ -1,0 +1,19 @@
+{
+  "name": "meals_side_project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:alexandrecoin/meals_side_project.git",
+  "author": "Alexandre Coin <alexandre.pc.coin@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon server"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.7.1"
+  },
+  "devDependencies": {
+    "dotenv": "^8.1.0",
+    "nodemon": "^1.19.2"
+  }
+}
