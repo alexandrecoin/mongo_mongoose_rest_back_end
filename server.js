@@ -16,6 +16,9 @@ app.use(express.json());
 const mealsRouter = require('./routes/meals');
 app.use('/meals', mealsRouter);
 
+const usersRouter = require('./routes/users');
+app.use('/users', usersRouter)
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
