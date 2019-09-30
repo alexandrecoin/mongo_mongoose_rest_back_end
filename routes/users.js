@@ -9,6 +9,7 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 var jwt = require('jsonwebtoken');
+const VerifyToken = require('../auth/verify-token');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -62,25 +63,15 @@ router.post('/signin', async (req, res) => {
   });
 });
 
-// PROBLEME AVEC CETTE ROUTE : VOIR https://www.freecodecamp.org/news/securing-node-js-restful-apis-with-json-web-tokens-9f811a92bb52/
-router.get('/me', (req, res) => {
-  const token = req.headers['x-access-token'];
-  if (!token)
-    return res.status(401).json({ auth: false, message: 'User not found' });
-  jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, decoded) => {
-    if (err) {
+// Get information about oneself
+router.get('/me', VerifyToken, (req, res) => {
+  User.findById(req.userId, { password: 0 }, (err, user) => {
+    if (err)
       return res
         .status(500)
-        .json({ auth: false, message: 'Failed to authenticate' });
-    }
-    User.findById(decoded.id, { password: 0 }, (err, user) => {
-      if (err)
-        return res
-          .status(500)
-          .json({ message: 'There was a problem finding the user.' });
-      if (!user) return res.status(404).json({ message: 'No user found.' });
-      res.status(200).send(user);
-    });
+        .json({ message: 'There was a problem finding the user.' });
+    if (!user) return res.status(404).json({ message: 'No user found.' });
+    res.status(200).send(user);
   });
 });
 
