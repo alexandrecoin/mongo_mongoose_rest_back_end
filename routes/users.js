@@ -9,15 +9,16 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 var jwt = require('jsonwebtoken');
-const VerifyToken = require('../auth/verify-token');
+const VerifyToken = require('../helpers/verify-token');
+const isAuthorized = require('../helpers/authorize');
 
 // Get all users
-router.get('/', async (req, res) => {
+router.get('/users', isAuthorized, async (req, res, next) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.json({ message: err.message });
   }
 });
 
@@ -34,6 +35,7 @@ router.post('/register', async (req, res) => {
     username: req.body.username,
     password: hashedPassword,
     email: req.body.email,
+    role: req.body.role,
   });
   try {
     await user.save();
@@ -48,7 +50,7 @@ router.post('/register', async (req, res) => {
 });
 
 //login page: storing and comparing email and password,and redirecting to home page after login
-router.post('/signin', async (req, res) => {
+router.post('/login', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(404).json({ message: 'User not found' });
   bcrypt.compare(req.body.password, user.password, (err, result) => {
@@ -64,7 +66,7 @@ router.post('/signin', async (req, res) => {
 });
 
 // Get information about oneself
-router.get('/me', VerifyToken, (req, res) => {
+router.get('/users/me', VerifyToken, (req, res) => {
   User.findById(req.userId, { password: 0 }, (err, user) => {
     if (err)
       return res
@@ -76,17 +78,17 @@ router.get('/me', VerifyToken, (req, res) => {
 });
 
 // Logout user
-router.get('/logout', (req, res) => {
+router.get('/users/logout', (req, res) => {
   res.status(200).json({ auth: false, token: null });
 });
 
 // Get one user
-router.get('/:id', getUser, (req, res) => {
+router.get('/users/:id', getUser, (req, res) => {
   res.json(res.user);
 });
 
 // Update one user
-router.patch('/update/:id', getUser, async (req, res) => {
+router.patch('/users/update/:id',isAuthorized, getUser, async (req, res) => {
   if (req.body.firstName) res.user.firstName = req.body.firstName;
   if (req.body.lastName) res.user.lastName = req.body.lastName;
   if (req.body.username) {
@@ -105,7 +107,7 @@ router.patch('/update/:id', getUser, async (req, res) => {
 });
 
 // Delete one user
-router.delete('/:id', getUser, async (req, res) => {
+router.delete('/users/delete/:id', getUser, async (req, res) => {
   try {
     await User.deleteOne({ email: res.user.email });
     res.json({ message: 'User removed from the DB' });

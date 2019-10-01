@@ -14,10 +14,10 @@ db.once('open', () => console.log('Connected to the database'));
 app.use(express.json());
 
 const mealsRouter = require('./routes/meals');
-app.use('/meals', mealsRouter);
+app.use('/', mealsRouter);
 
 const usersRouter = require('./routes/users');
-app.use('/users', usersRouter)
+app.use('/', usersRouter)
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
