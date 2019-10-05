@@ -3,13 +3,13 @@ const jwt = require('jsonwebtoken');
 // const VerifyToken = require('../helpers/verify-token'); Copied in the below function, to be imported
 const User = require('../models/User');
 const routesRights = require('../utils/routes-rights');
+const session = require('express-session');
 
 function isAuthorized(req, res, next) {
-  const token = req.headers['x-access-token'];
-  if (!token)
+  if (!session.token)
     return res.status(403).json({ auth: false, message: 'No token provided' });
 
-  jwt.verify(token, process.env.TOKEN_SECRET_KEY, async (err, decoded) => {
+  jwt.verify(session.token, process.env.TOKEN_SECRET_KEY, async (err, decoded) => {
     if (err)
       res
         .status(500)
