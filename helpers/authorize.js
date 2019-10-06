@@ -15,8 +15,8 @@ function isAuthorized(req, res, next) {
         .status(500)
         .send({ auth: false, message: 'Failed to authenticate token.' });
 
-    userId = decoded.id;
-    const user = await User.findById(userId);
+    req.userId = decoded.id;
+    const user = await User.findById(req.userId);
     if (!routesRights[req.route.path].includes(user.role))
       return (res.error = res.status(401).json({ message: 'Unauthorized' }));
     next();

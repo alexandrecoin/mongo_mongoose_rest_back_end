@@ -25,10 +25,8 @@ router.get('/users', isAuthorized, async (req, res, next) => {
 
 // Create one user
 router.post('/register', async (req, res) => {
-  // Check if user already exists
   const isUser = await User.findOne({ email: req.body.email });
   if (isUser) return res.status(409).json({ message: 'User already exists' });
-  // Hash password
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   const user = new User({
     firstName: req.body.firstName,
@@ -41,9 +39,6 @@ router.post('/register', async (req, res) => {
   try {
     await user.save();
     res.status(201).json({ message: 'Account created' });
-    // var token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET_KEY, {
-    // });
-    // res.status(201).json({ auth: true, token });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -62,13 +57,12 @@ router.post('/login', async (req, res) => {
       expiresIn: 86400,
     });
     session.token = token;
-    console.log(session);
     res.status(200).json({ auth: true, token });
   });
 });
 
 // Get information about oneself
-router.get('/users/me', VerifyToken, (req, res) => {
+router.get('/users/profile', isAuthorized, (req, res) => {
   User.findById(req.userId, { password: 0 }, (err, user) => {
     if (err)
       return res
@@ -79,12 +73,10 @@ router.get('/users/me', VerifyToken, (req, res) => {
   });
 });
 
-// /!\ CAN'T DESTROY USER SESSION
-
 // Logout user
 router.get('/users/logout', (req, res) => {
   req.session.destroy();
-  delete session.token
+  delete session.token;
   res.status(200).json({ auth: null, message: 'Disconnected' });
 });
 

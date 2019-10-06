@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Meal = require('../models/Meal');
+const isAuthorized = require('../helpers/authorize')
 
 // Get all meals
 router.get('/meals', async (req, res) => {
@@ -18,7 +19,7 @@ router.get('/meals/:id', getMeal, (req, res) => {
 });
 
 // Create one meal
-router.post('/meals/add', async (req, res) => {
+router.post('/meals/add',isAuthorized, async (req, res) => {
   const meal = new Meal({
     name: req.body.name,
   });
@@ -31,7 +32,7 @@ router.post('/meals/add', async (req, res) => {
 });
 
 // Update one meal
-router.patch('/meals/update/:id', getMeal, async (req, res) => {
+router.patch('/meals/update/:id',isAuthorized, getMeal, async (req, res) => {
   if (req.body.name) {
     res.meal.name = req.body.name;
   }
@@ -44,7 +45,7 @@ router.patch('/meals/update/:id', getMeal, async (req, res) => {
 });
 
 // Delete one meal
-router.delete('/meals/:id', getMeal, async (req, res) => {
+router.delete('/meals/delete/:id',isAuthorized, getMeal, async (req, res) => {
   try {
     await res.meal.remove();
     res.json({ message: 'Meal removed from the DB' });
