@@ -2,8 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
+const Comment = require('../models/Comment');
+const Meal = require('../models/Meal');
 
+const bcrypt = require('bcryptjs');
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
@@ -48,6 +50,8 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(404).json({ message: 'User not found' });
+  if (user.active === false)
+    return res.status(401).json({ message: 'Accound deactivated' });
   bcrypt.compare(req.body.password, user.password, (_, result) => {
     if (result === false)
       return res
@@ -107,15 +111,21 @@ router.patch('/users/update/:id', isAuthorized, getUser, async (req, res) => {
   }
 });
 
-// Delete one user
-router.delete('/users/delete/:id', getUser, async (req, res) => {
-  try {
-    await User.deleteOne({ email: res.user.email });
-    res.json({ message: 'User removed from the DB' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// Deactivate one user
+router.get(
+  '/users/deactivate/:id',
+  isAuthorized,
+  getUser,
+  async (req, res) => {
+    try {
+      res.user.active = false;
+      res.user.save()
+      res.json({ message: 'User account deactivated' });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+);
 
 // Middleware function to be called for GET one, PATCH and DELETE requests
 async function getUser(req, res, next) {

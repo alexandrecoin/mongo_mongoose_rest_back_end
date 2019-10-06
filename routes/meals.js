@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Meal = require('../models/Meal');
-const isAuthorized = require('../helpers/authorize')
+const Comment = require('../models/Comment');
+const isAuthorized = require('../helpers/authorize');
 
 // Get all meals
 router.get('/meals', async (req, res) => {
@@ -19,9 +20,10 @@ router.get('/meals/:id', getMeal, (req, res) => {
 });
 
 // Create one meal
-router.post('/meals/add',isAuthorized, async (req, res) => {
+router.post('/meals/add', isAuthorized, async (req, res) => {
   const meal = new Meal({
     name: req.body.name,
+    createdBy: req.userId,
   });
   try {
     const newMeal = await meal.save();
@@ -32,20 +34,32 @@ router.post('/meals/add',isAuthorized, async (req, res) => {
 });
 
 // Update one meal
-router.patch('/meals/update/:id',isAuthorized, getMeal, async (req, res) => {
+router.patch('/meals/update/:id', isAuthorized, getMeal, async (req, res) => {
   if (req.body.name) {
     res.meal.name = req.body.name;
   }
   try {
-    const updatedMeal = await res.meal.save()
-    res.json(updatedMeal)
+    const updatedMeal = await res.meal.save();
+    res.json(updatedMeal);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
+// Create comment on meal
+router.post('/meals/comment/:id', isAuthorized, getMeal, async (req, res) => {
+  const comment = new Comment({
+    postedBy: req.userId,
+    description: req.body.description,
+  });
+  const newComment = await comment.save();
+  res.meal.comments.push(newComment._id);
+  await res.meal.save()
+  res.status(201).json({ message: 'Comment added' });
+});
+
 // Delete one meal
-router.delete('/meals/delete/:id',isAuthorized, getMeal, async (req, res) => {
+router.delete('/meals/delete/:id', isAuthorized, getMeal, async (req, res) => {
   try {
     await res.meal.remove();
     res.json({ message: 'Meal removed from the DB' });

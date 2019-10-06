@@ -28,6 +28,9 @@ app.use(helmet());
 const mealsRouter = require('./routes/meals');
 app.use('/', mealsRouter);
 
+const commentsRouter = require('./routes/comments');
+app.use('/', commentsRouter)
+
 const usersRouter = require('./routes/users');
 app.use('/', usersRouter);
 

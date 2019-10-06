@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: 'user'
   },
+  active: {
+    type: Boolean,
+    required: true,
+    default: true
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);
