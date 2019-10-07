@@ -17,6 +17,7 @@ const routesRights = {
   '/comment/like/:id': ['user', 'admin'],
   '/comment/delete/:id': ['user', 'admin'],
   '/comment/like/delete/:id': ['user', 'admin'],
+  '/photo/upload/:id': ['user', 'admin'],
 };
 
 module.exports = routesRights;

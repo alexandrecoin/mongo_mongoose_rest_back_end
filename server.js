@@ -20,7 +20,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true, expires: 3600, httpOnly: false },
-    unset: 'destroy'
+    unset: 'destroy',
   }),
 );
 app.use(helmet());
@@ -29,10 +29,13 @@ const mealsRouter = require('./routes/meals');
 app.use('/', mealsRouter);
 
 const commentsRouter = require('./routes/comments');
-app.use('/', commentsRouter)
+app.use('/', commentsRouter);
 
 const usersRouter = require('./routes/users');
 app.use('/', usersRouter);
+
+const photoRouter = require('./routes/photos');
+app.use('/', photoRouter);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
