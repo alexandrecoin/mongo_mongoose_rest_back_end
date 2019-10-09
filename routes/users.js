@@ -1,12 +1,11 @@
 require('dotenv').config();
+const fs = require('fs');
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Comment = require('../models/Comment');
 const Meal = require('../models/Meal');
-
-const nodemailer = require('nodemailer');
-let transport = require('../server');
+const { transport } = require('../services/mailer/sendMail');
 
 const bcrypt = require('bcryptjs');
 var bodyParser = require('body-parser');
@@ -17,15 +16,6 @@ var jwt = require('jsonwebtoken');
 let session = require('express-session');
 const VerifyToken = require('../helpers/verify-token');
 const isAuthorized = require('../helpers/authorize');
-
-transport = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: 2525,
-  auth: {
-    user: process.env.MAIL_USERNAME,
-    pass: process.env.MAIL_PASSWORD,
-  },
-});
 
 // Get all users
 router.get('/users', isAuthorized, async (req, res, next) => {
@@ -52,16 +42,25 @@ router.post('/register', async (req, res) => {
   });
   try {
     await user.save();
-    const message = {
-      from: process.env.MAIL_TEST_ADDRESS, // Sender address
-      to: 'to@email.com', // List of recipients
-      subject: 'Thank you for subscribing', // Subject line
-      text: 'Welcome to this side project website', // Plain text body
-    };
-    await transport.sendMail(message, function(err, info) {
-      if (err) console.log(err);
-      else console.log(info);
-    });
+    fs.readFile(
+      __dirname + '/../services/mailer/templates/subscription.html',
+      { encoding: 'utf-8' },
+      function(err, html) {
+        if (err) console.log(err);
+        else {
+          var mailOptions = {
+            from: process.env.MAIL_TEST_ADDRESS, // Sender address
+            to: 'to@email.com', // List of recipients
+            subject: 'Thank you for subscribing', // Subject line
+            html: html,
+          };
+          transport.sendMail(mailOptions, function(error, info) {
+            if (error) console.log(error);
+            else console.log('Email sent: ' + info.response);
+          });
+        }
+      },
+    );
     res.status(201).json({ message: 'Account created' });
   } catch (err) {
     res.status(400).json({ message: err.message });
