@@ -5,6 +5,9 @@ const User = require('../models/User');
 const Comment = require('../models/Comment');
 const Meal = require('../models/Meal');
 
+const nodemailer = require('nodemailer');
+let transport = require('../server');
+
 const bcrypt = require('bcryptjs');
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -14,6 +17,15 @@ var jwt = require('jsonwebtoken');
 let session = require('express-session');
 const VerifyToken = require('../helpers/verify-token');
 const isAuthorized = require('../helpers/authorize');
+
+transport = nodemailer.createTransport({
+  host: process.env.MAIL_HOST,
+  port: 2525,
+  auth: {
+    user: process.env.MAIL_USERNAME,
+    pass: process.env.MAIL_PASSWORD,
+  },
+});
 
 // Get all users
 router.get('/users', isAuthorized, async (req, res, next) => {
@@ -40,6 +52,16 @@ router.post('/register', async (req, res) => {
   });
   try {
     await user.save();
+    const message = {
+      from: process.env.MAIL_TEST_ADDRESS, // Sender address
+      to: 'to@email.com', // List of recipients
+      subject: 'Thank you for subscribing', // Subject line
+      text: 'Welcome to this side project website', // Plain text body
+    };
+    await transport.sendMail(message, function(err, info) {
+      if (err) console.log(err);
+      else console.log(info);
+    });
     res.status(201).json({ message: 'Account created' });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -112,20 +134,15 @@ router.patch('/users/update/:id', isAuthorized, getUser, async (req, res) => {
 });
 
 // Deactivate one user
-router.get(
-  '/users/deactivate/:id',
-  isAuthorized,
-  getUser,
-  async (req, res) => {
-    try {
-      res.user.active = false;
-      res.user.save()
-      res.json({ message: 'User account deactivated' });
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
-);
+router.get('/users/deactivate/:id', isAuthorized, getUser, async (req, res) => {
+  try {
+    res.user.active = false;
+    res.user.save();
+    res.json({ message: 'User account deactivated' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // Middleware function to be called for GET one, PATCH and DELETE requests
 async function getUser(req, res, next) {
