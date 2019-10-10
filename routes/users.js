@@ -30,9 +30,11 @@ router.get('/users', isAuthorized, async (req, res, next) => {
 
 // Create one user
 router.post('/register', async (req, res) => {
-  const isUser = await User.findOne({ email: req.body.email });
-  if (isUser) return res.status(409).json({ message: 'User already exists' });
+  const isUserAlreadyRegistered = await User.findOne({ email: req.body.email });
+  if (isUserAlreadyRegistered)
+    return res.status(409).json({ message: 'User already exists' });
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  let link = '';
   const user = new User({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -40,7 +42,15 @@ router.post('/register', async (req, res) => {
     password: hashedPassword,
     email: req.body.email,
     role: req.body.role,
+    activeToken:
+      Math.random()
+        .toString(36)
+        .substring(2, 15) +
+      Math.random()
+        .toString(36)
+        .substring(2, 15),
   });
+  link = 'http://localhost:8080/active/' + user.activeToken;
   try {
     await user.save();
     fs.readFile(
@@ -48,7 +58,7 @@ router.post('/register', async (req, res) => {
       { encoding: 'utf-8' },
       (err, template) => {
         if (err) console.log(err);
-        else sendEmail('subscription', template);
+        else sendEmail('subscription', template, link);
       },
     );
     res.status(201).json({ message: 'Account created' });
@@ -57,11 +67,22 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.get('/active/:activeToken', async (req, res, next) => {
+  const user = await User.findOne({ activeToken: req.params.activeToken });
+  if (!user)
+    return res.status(400).json({ message: 'Invalid activation link' });
+  user.active = true;
+  user.save(function(err, user) {
+    if (err) return next(err);
+    res.status(200).json({ message: 'Account activated' });
+  });
+});
+
 //login page: storing and comparing email and password,and redirecting to home page after login
 router.post('/login', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(404).json({ message: 'User not found' });
-  if (user.active === false)
+  if (!user.active)
     return res.status(401).json({ message: 'Accound deactivated' });
   bcrypt.compare(req.body.password, user.password, (_, result) => {
     if (result === false)

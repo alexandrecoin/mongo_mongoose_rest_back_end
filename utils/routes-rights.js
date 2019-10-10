@@ -1,5 +1,6 @@
 const routesRights = {
   '/register': [],
+  '/active/:activeToken': [],
   '/login': [],
   '/users': ['user', 'admin'],
   '/users/:id': ['user', 'admin'],

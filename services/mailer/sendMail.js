@@ -11,14 +11,14 @@ transport = nodemailer.createTransport({
   },
 });
 
-sendEmail = async (moment, template) => {
+sendEmail = async (moment, template, link) => {
   var mailOptions = {
     from: process.env.MAIL_TEST_ADDRESS, // Sender address
     to: 'to@email.com', // List of recipients
     subject: 'Thank you for subscribing', // Subject line
   };
   if (moment === 'subscription')
-    mailOptions = { ...mailOptions, html: template };
+    mailOptions = { ...mailOptions, html: 'Please click <a href="' + link + '"> here </a> to activate your account.' };
   transport.sendMail(mailOptions, function(error, info) {
     if (error) console.log(error);
     else console.log('Email sent: ' + info.response);

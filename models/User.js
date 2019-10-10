@@ -26,13 +26,20 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    default: 'user'
+    default: 'user',
   },
   active: {
     type: Boolean,
     required: true,
-    default: true
-  }
+    default: false,
+  },
+  activeToken: {
+    type: String,
+  },
+  activeTokenExpires: {
+    type: Date,
+    default: Date.now() + 24 * 3600 * 1000,
+  },
 });
 
 module.exports = mongoose.model('User', userSchema);
