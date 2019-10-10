@@ -5,7 +5,8 @@ const router = express.Router();
 const User = require('../models/User');
 const Comment = require('../models/Comment');
 const Meal = require('../models/Meal');
-const { transport } = require('../services/mailer/sendMail');
+const { transport, sendEmail } = require('../services/mailer/sendMail');
+const { getUser } = require('../services/UserService');
 
 const bcrypt = require('bcryptjs');
 var bodyParser = require('body-parser');
@@ -45,20 +46,9 @@ router.post('/register', async (req, res) => {
     fs.readFile(
       __dirname + '/../services/mailer/templates/subscription.html',
       { encoding: 'utf-8' },
-      function(err, html) {
+      (err, template) => {
         if (err) console.log(err);
-        else {
-          var mailOptions = {
-            from: process.env.MAIL_TEST_ADDRESS, // Sender address
-            to: 'to@email.com', // List of recipients
-            subject: 'Thank you for subscribing', // Subject line
-            html: html,
-          };
-          transport.sendMail(mailOptions, function(error, info) {
-            if (error) console.log(error);
-            else console.log('Email sent: ' + info.response);
-          });
-        }
+        else sendEmail('subscription', template);
       },
     );
     res.status(201).json({ message: 'Account created' });
@@ -142,19 +132,5 @@ router.get('/users/deactivate/:id', isAuthorized, getUser, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-// Middleware function to be called for GET one, PATCH and DELETE requests
-async function getUser(req, res, next) {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
-    res.user = user;
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-  next();
-}
 
 module.exports = router;
