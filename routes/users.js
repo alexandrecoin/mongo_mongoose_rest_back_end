@@ -3,9 +3,7 @@ const fs = require('fs');
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const Comment = require('../models/Comment');
-const Meal = require('../models/Meal');
-const { transport, sendEmail } = require('../services/mailer/sendMail');
+const { sendEmail } = require('../services/mailer/sendMail');
 const { getUser } = require('../services/UserService');
 
 const bcrypt = require('bcryptjs');
@@ -15,7 +13,6 @@ router.use(bodyParser.json());
 
 var jwt = require('jsonwebtoken');
 let session = require('express-session');
-const VerifyToken = require('../helpers/verify-token');
 const isAuthorized = require('../helpers/authorize');
 
 // Get all users
