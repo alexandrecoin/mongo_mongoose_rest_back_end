@@ -2,6 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Login from './components/Login';
+import Meals from './components/Meals';
 
 function App() {
   return (
@@ -19,7 +20,8 @@ function App() {
         >
           Learn React
         </a>
-        <Login/>
+        <Login />
+        <Meals />
       </header>
     </div>
   );
