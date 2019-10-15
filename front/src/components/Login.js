@@ -1,49 +1,47 @@
-import React,  {Fragment} from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 
-class Login extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { email: '', password: '' };
+export default function Login(props) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  function validateForm() {
+    return email.length > 0 && password.length > 0;
   }
 
-  handleEmailChange = (event) => {
-    this.setState({ email: event.target.value });
-  };
-
-  handlePasswordChange = (event) => {
-    this.setState({ password: event.target.value });
-  };
-
-  handleSubmit = (event) => {
-    alert('A name was submitted: ' + this.state.email);
+  async function handleSubmit(event) {
     event.preventDefault();
-  };
-
-  render() {
-    return (
-      <Fragment>
-        <form onSubmit={this.handleSubmit}>
-          <label>
-            Email:
-            <input
-              type="email"
-              value={this.state.email}
-              onChange={this.handleEmailChange}
-            />
-          </label>
-          <label>
-            password:
-            <input
-              type="password"
-              value={this.state.password}
-              onChange={this.handlePasswordChange}
-            />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-      </Fragment>
-    );
+    const login = await axios.post('/login', {
+      email,
+      password,
+    });
+    if (login.data.token) console.log('Auth OK')
   }
-}
 
-export default Login;
+  return (
+    <div className="Login">
+      <form onSubmit={handleSubmit}>
+        <div id="email">
+          <label>Email</label>
+          <input
+            autoFocus
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div id="password">
+          <label>Password</label>
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+          />
+        </div>
+        <button disabled={!validateForm()} type="submit">
+          Login
+        </button>
+      </form>
+    </div>
+  );
+}
