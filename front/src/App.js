@@ -7,18 +7,8 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <header className="App-header">
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <Route path="/login" component={Login} />
-          <Route exact path="/meals" component={Meals} />
-        </header>
+        <Route path="/login" component={Login} />
+        <Route exact path="/meals" component={Meals} />
       </div>
     </Router>
   );
