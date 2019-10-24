@@ -15,7 +15,7 @@ export default function Login(props) {
       email,
       password,
     });
-    if (login.data.token) console.log('Auth OK')
+    if (login.data.token) console.log(login.data)
   }
 
   return (

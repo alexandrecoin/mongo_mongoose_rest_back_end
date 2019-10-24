@@ -78,6 +78,7 @@ router.get('/active/:activeToken', async (req, res, next) => {
 //login page: storing and comparing email and password,and redirecting to home page after login
 router.post('/login', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
+  const { firstName, lastName, role, email } = user;
   if (!user) return res.status(404).json({ message: 'User not found' });
   if (!user.active)
     return res.status(401).json({ message: 'Accound deactivated' });
@@ -90,7 +91,9 @@ router.post('/login', async (req, res) => {
       expiresIn: 86400,
     });
     session.token = token;
-    res.status(200).json({ auth: true, token });
+    res
+      .status(200)
+      .json({ auth: true, token, firstName, lastName, role, email });
   });
 });
 
