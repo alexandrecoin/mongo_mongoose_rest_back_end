@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -24,41 +24,43 @@ export default function Login(props) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <StyledCard className="loginCard">
-        <StyledTextField
-          id="outlined-email-input"
-          label="Email"
-          type="email"
-          name="email"
-          autoComplete="email"
-          margin="normal"
-          variant="outlined"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <StyledTextField
-          id="outlined-password-input"
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          margin="normal"
-          variant="outlined"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <StyledCardActions>
-          <Button disabled={!validateForm()} type="submit">
-            Login
-          </Button>
-        </StyledCardActions>
-      </StyledCard>
-    </form>
+    <Fragment>
+      <form onSubmit={handleSubmit}>
+        <StyledCard className="loginCard">
+          <StyledTextField
+            id="outlined-email-input"
+            label="Email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            margin="normal"
+            variant="outlined"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <StyledTextField
+            id="outlined-password-input"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            margin="normal"
+            variant="outlined"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <StyledCardActions>
+            <Button disabled={!validateForm()} type="submit">
+              Login
+            </Button>
+          </StyledCardActions>
+        </StyledCard>
+      </form>
+    </Fragment>
   );
 }
 
 const StyledCard = styled(Card)`
-  max-height: 30%;
+  height: 30%;
   max-width: 25%;
   font-size: 1.5em;
   text-align: center;
@@ -66,6 +68,9 @@ const StyledCard = styled(Card)`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  &:hover {
+    box-shadow: 5px 5px 2px 1px rgba(255, 105, 135, 0.3);
+  }
 `;
 
 const StyledTextField = styled(TextField)`
@@ -82,5 +87,4 @@ const StyledCardActions = styled(CardActions)`
   margin: auto;
   width: 25%;
   padding: 0 30px;
-  box-shadow: 0 3px 5px 2px rgba(255, 105, 135, 0.3);
 `;
