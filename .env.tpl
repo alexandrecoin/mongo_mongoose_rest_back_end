@@ -1,0 +1,13 @@
+// Mailer (nodemailer)
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_HOST=
+MAIL_TEST_ADDRESS=
+
+// Cloudinary
+CLOUD_NAME=
+API_KEY=
+API_SECRET=
+
+// General
+TOKEN_SECRET_KEY=
